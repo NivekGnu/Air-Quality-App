@@ -99,4 +99,9 @@ Without this the server would not recognise the session.
 
 ---
 
-## Adding AI Later
+## AI Portion
+# Ensure you have python installed; currently using GPT-2
+cd ai
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
