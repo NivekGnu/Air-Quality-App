@@ -1,3 +1,19 @@
+# Standard .gitignore files
 .env
 node_modules/
 package-lock.json
+
+# Ignore MacOS system files
+.DS_Store
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# AI 
+ai/venv/
+ai/models/

@@ -9,7 +9,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3001;
 const authRoutes = require('./routes/authentication');
-//const aiRoutes = require('./routes/ai');
+const aiRoutes = require('./routes/ai');
 const requireAuth = require('./middleware/requireAuth');
 
 app.use(cors({
@@ -32,6 +32,6 @@ app.use(session({
 app.use('/api/auth', authRoutes);
  
 // Needs a valid session to access these routes to protect token usage
-//app.use('/api/ai', requireAuth, aiRoutes);
+app.use('/api/ai', requireAuth, aiRoutes);
  
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
