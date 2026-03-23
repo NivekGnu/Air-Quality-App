@@ -32,28 +32,36 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
+    console.log('Login attempt:', email);
+
     if (!email || !password)
         return res.status(400).json({ error: 'Email and password are required' });
 
     try {
         const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+        console.log('DB query result:', result.rows.length, 'users found');
+        
         const user = result.rows[0];
 
         if (!user)
             return res.status(401).json({ error: 'Invalid credentials' });
 
         const match = await bcrypt.compare(password, user.password_hash);
+        console.log('Password match:', match);
+        
         if (!match)
             return res.status(401).json({ error: 'Invalid credentials' });
 
-        // Save user info to session
         req.session.user = { id: user.id, email: user.email, role: user.role };
+        console.log('Session set:', req.session.user);
 
         res.json({ user: req.session.user });
     } catch (err) {
+        console.error('Login error:', err.message);
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
