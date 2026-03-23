@@ -4,7 +4,7 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "https://your-actual-railway-url.railway.app/api/:splat"
+  to = "air-quality-app-production-e716.up.railway.app/api/:splat"
   status = 200
   force = true
 
