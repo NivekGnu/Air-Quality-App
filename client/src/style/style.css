@@ -1,0 +1,994 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ADMIN PAGE */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── CSS Variables ─────────────────────────────────────────── */
+:root {
+  --fc-bg:        #0b1220;
+  --fc-surface:   #111c2e;
+  --fc-border:    rgba(255 255 255 / 0.07);
+  --fc-blue:      #2f7aff;
+  --fc-blue-dim:  #1a4db0;
+  --fc-text:      #e8edf5;
+  --fc-muted:     #7a8ba8;
+  --fc-good:      #22c55e;
+  --fc-moderate:  #eab308;
+  --fc-sensitive: #f97316;
+  --fc-poor:      #ef4444;
+}
+
+/* ── Page shell ────────────────────────────────────────────── */
+.admin-page {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 60% 0%, #112244 0%, var(--fc-bg) 60%);
+  color: var(--fc-text);
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Navbar ────────────────────────────────────────────────── */
+.admin-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  height: 56px;
+  background: rgba(11 18 32 / 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--fc-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.admin-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-nav__fan {
+  width: 26px;
+  height: 26px;
+  animation: fan-spin 3s linear infinite;
+}
+
+.admin-nav__title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  color: var(--fc-text);
+}
+
+.admin-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-nav__badge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fc-blue);
+  border: 1px solid var(--fc-blue-dim);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+.admin-nav__logout {
+  background: transparent;
+  border: 1px solid var(--fc-border);
+  color: var(--fc-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.admin-nav__logout:hover {
+  color: var(--fc-text);
+  border-color: rgba(255 255 255 / 0.2);
+}
+
+/* ── Hero ──────────────────────────────────────────────────── */
+.admin-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 72px 24px 56px;
+  text-align: center;
+}
+
+.admin-hero__fan {
+  width: 90px;
+  height: 90px;
+  animation: fan-spin 2.5s linear infinite;
+  margin-bottom: 28px;
+  filter: drop-shadow(0 0 24px rgba(47 122 255 / 0.35));
+}
+
+.admin-hero__heading {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  color: var(--fc-blue);
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.admin-hero__sub {
+  font-size: 1rem;
+  color: var(--fc-muted);
+  margin: 0;
+}
+
+.admin-hero__sub strong {
+  color: var(--fc-text);
+  font-weight: 500;
+}
+
+/* ── Main grid ─────────────────────────────────────────────── */
+.admin-main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+  display: grid;
+  gap: 20px;
+}
+
+/* ── Card ──────────────────────────────────────────────────── */
+.admin-card {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-border);
+  border-radius: 16px;
+  padding: 28px 32px;
+}
+
+.admin-card__title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fc-muted);
+  margin: 0 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-card__live {
+  font-size: 0.65rem;
+  background: rgba(47 122 255 / 0.15);
+  color: var(--fc-blue);
+  border: 1px solid rgba(47 122 255 / 0.3);
+  border-radius: 999px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── Prediction layout ─────────────────────────────────────── */
+.prediction {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.prediction__aqi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  background: rgba(255 255 255 / 0.04);
+  border-radius: 12px;
+  padding: 20px 16px;
+  border: 1px solid var(--fc-border);
+  flex-shrink: 0;
+}
+
+.prediction__aqi-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--fc-text);
+}
+
+.prediction__aqi-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+  margin-top: 4px;
+}
+
+/* AQI colour states */
+.aqi-good    .prediction__aqi-num { color: var(--fc-good); }
+.aqi-moderate .prediction__aqi-num { color: var(--fc-moderate); }
+.aqi-sensitive .prediction__aqi-num { color: var(--fc-sensitive); }
+.aqi-poor    .prediction__aqi-num { color: var(--fc-poor); }
+
+.prediction__details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.prediction__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--fc-border);
+}
+
+.prediction__row:last-of-type {
+  border-bottom: none;
+}
+
+.prediction__key {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fc-muted);
+}
+
+.prediction__val {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--fc-text);
+}
+
+.prediction__note {
+  font-size: 0.75rem;
+  color: var(--fc-muted);
+  margin: 4px 0 0;
+  font-style: italic;
+}
+
+/* ── System info list ──────────────────────────────────────── */
+.admin-syslist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.admin-syslist__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--fc-border);
+}
+
+.admin-syslist__item:last-child {
+  border-bottom: none;
+}
+
+.admin-syslist__key {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fc-muted);
+}
+
+.admin-syslist__val {
+  font-size: 0.9rem;
+  color: var(--fc-text);
+}
+
+/* ── Loading state ─────────────────────────────────────────── */
+.admin-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--fc-muted);
+  font-size: 0.9rem;
+}
+
+.admin-loading__fan {
+  width: 24px;
+  height: 24px;
+  animation: fan-spin 1s linear infinite;
+}
+
+/* ── Fan spin keyframe ─────────────────────────────────────── */
+@keyframes fan-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .prediction {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .prediction__aqi {
+    width: 100%;
+    flex-direction: row;
+    gap: 12px;
+    padding: 16px 20px;
+  }
+
+  .admin-card {
+    padding: 20px;
+  }
+}
+
+
+/* LOGIN PAGE */
+
+/* ============================================================
+   LOGIN PAGE — append to client/src/style/style.css
+   All classes prefixed with "login-" to prevent leaking
+   ============================================================ */
+
+.login-page {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 40% 0%, #112244 0%, #0b1220 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #111c2e;
+  border: 1px solid rgba(255 255 255 / 0.07);
+  border-radius: 20px;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Logo ──────────────────────────────────────────────────── */
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.login-logo__fan {
+  width: 32px;
+  height: 32px;
+  animation: fan-spin 3s linear infinite;
+}
+
+.login-logo__text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #e8edf5;
+  letter-spacing: 0.03em;
+}
+
+/* ── Heading ───────────────────────────────────────────────── */
+.login-heading {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #2f7aff;
+  margin: 0 0 6px;
+  text-align: center;
+}
+
+.login-sub {
+  font-size: 0.88rem;
+  color: #7a8ba8;
+  margin: 0 0 28px;
+  text-align: center;
+}
+
+/* ── Form ──────────────────────────────────────────────────── */
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #7a8ba8;
+}
+
+.login-input {
+  background: rgba(255 255 255 / 0.04);
+  border: 1px solid rgba(255 255 255 / 0.1);
+  border-radius: 10px;
+  color: #e8edf5;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  padding: 11px 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.login-input::placeholder {
+  color: #3a4a60;
+}
+
+.login-input:focus {
+  border-color: #2f7aff;
+  box-shadow: 0 0 0 3px rgba(47 122 255 / 0.15);
+}
+
+/* ── Error ─────────────────────────────────────────────────── */
+.login-error {
+  font-size: 0.82rem;
+  color: #ef4444;
+  background: rgba(239 68 68 / 0.1);
+  border: 1px solid rgba(239 68 68 / 0.25);
+  border-radius: 8px;
+  padding: 9px 13px;
+  margin: 0;
+}
+
+/* ── Button ────────────────────────────────────────────────── */
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background: #2f7aff;
+  color: #fff;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 4px;
+}
+
+.login-btn:hover {
+  background: #1a5fe0;
+}
+
+.login-btn:active {
+  transform: scale(0.98);
+}
+
+/* ── Footer link ───────────────────────────────────────────── */
+.login-footer {
+  margin: 22px 0 0;
+  font-size: 0.85rem;
+  color: #7a8ba8;
+}
+
+.login-footer__link {
+  color: #2f7aff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-footer__link:hover {
+  text-decoration: underline;
+}
+
+/* REGISTRATION */
+
+/* ============================================================
+   REGISTER PAGE — append to client/src/style/style.css
+   All classes prefixed with "register-" to prevent leaking
+   ============================================================ */
+
+.register-page {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 60% 0%, #112244 0%, #0b1220 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 420px;
+  background: #111c2e;
+  border: 1px solid rgba(255 255 255 / 0.07);
+  border-radius: 20px;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Logo ──────────────────────────────────────────────────── */
+.register-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.register-logo__fan {
+  width: 32px;
+  height: 32px;
+  animation: fan-spin 3s linear infinite;
+}
+
+.register-logo__text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #e8edf5;
+  letter-spacing: 0.03em;
+}
+
+/* ── Heading ───────────────────────────────────────────────── */
+.register-heading {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #2f7aff;
+  margin: 0 0 6px;
+  text-align: center;
+}
+
+.register-sub {
+  font-size: 0.88rem;
+  color: #7a8ba8;
+  margin: 0 0 28px;
+  text-align: center;
+}
+
+/* ── Form ──────────────────────────────────────────────────── */
+.register-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.register-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.register-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #7a8ba8;
+}
+
+.register-input {
+  background: rgba(255 255 255 / 0.04);
+  border: 1px solid rgba(255 255 255 / 0.1);
+  border-radius: 10px;
+  color: #e8edf5;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  padding: 11px 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.register-input::placeholder {
+  color: #3a4a60;
+}
+
+.register-input:focus {
+  border-color: #2f7aff;
+  box-shadow: 0 0 0 3px rgba(47 122 255 / 0.15);
+}
+
+/* ── Select ────────────────────────────────────────────────── */
+.register-select {
+  background: rgba(255 255 255 / 0.04);
+  border: 1px solid rgba(255 255 255 / 0.1);
+  border-radius: 10px;
+  color: #e8edf5;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  padding: 11px 14px;
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a8ba8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+.register-select:focus {
+  border-color: #2f7aff;
+  box-shadow: 0 0 0 3px rgba(47 122 255 / 0.15);
+}
+
+.register-select option {
+  background: #111c2e;
+  color: #e8edf5;
+}
+
+/* ── Messages ──────────────────────────────────────────────── */
+.register-error {
+  font-size: 0.82rem;
+  color: #ef4444;
+  background: rgba(239 68 68 / 0.1);
+  border: 1px solid rgba(239 68 68 / 0.25);
+  border-radius: 8px;
+  padding: 9px 13px;
+  margin: 0;
+}
+
+.register-success {
+  font-size: 0.82rem;
+  color: #22c55e;
+  background: rgba(34 197 94 / 0.1);
+  border: 1px solid rgba(34 197 94 / 0.25);
+  border-radius: 8px;
+  padding: 9px 13px;
+  margin: 0;
+}
+
+/* ── Button ────────────────────────────────────────────────── */
+.register-btn {
+  width: 100%;
+  padding: 12px;
+  background: #2f7aff;
+  color: #fff;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 4px;
+}
+
+.register-btn:hover {
+  background: #1a5fe0;
+}
+
+.register-btn:active {
+  transform: scale(0.98);
+}
+
+/* ── Footer link ───────────────────────────────────────────── */
+.register-footer {
+  margin: 22px 0 0;
+  font-size: 0.85rem;
+  color: #7a8ba8;
+}
+
+.register-footer__link {
+  color: #2f7aff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.register-footer__link:hover {
+  text-decoration: underline;
+}
+
+/* USER DASHBOARD */
+/* ============================================================
+   USER DASHBOARD — append to client/src/style/style.css
+   All classes prefixed with "udash-" to prevent leaking
+   ============================================================ */
+
+.udash-page {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 40% 0%, #112244 0%, #0b1220 60%);
+  color: #e8edf5;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Navbar ────────────────────────────────────────────────── */
+.udash-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  height: 56px;
+  background: rgba(11 18 32 / 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255 255 255 / 0.07);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.udash-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.udash-nav__fan {
+  width: 26px;
+  height: 26px;
+  animation: fan-spin 3s linear infinite;
+}
+
+.udash-nav__title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  color: #e8edf5;
+}
+
+.udash-nav__logout {
+  background: transparent;
+  border: 1px solid rgba(255 255 255 / 0.07);
+  color: #7a8ba8;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.udash-nav__logout:hover {
+  color: #e8edf5;
+  border-color: rgba(255 255 255 / 0.2);
+}
+
+/* ── Hero ──────────────────────────────────────────────────── */
+.udash-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 72px 24px 56px;
+  text-align: center;
+}
+
+.udash-hero__fan {
+  width: 90px;
+  height: 90px;
+  animation: fan-spin 2.5s linear infinite;
+  margin-bottom: 28px;
+  filter: drop-shadow(0 0 24px rgba(47 122 255 / 0.35));
+}
+
+.udash-hero__heading {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  color: #2f7aff;
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.udash-hero__sub {
+  font-size: 1rem;
+  color: #7a8ba8;
+  margin: 0;
+}
+
+.udash-hero__sub strong {
+  color: #e8edf5;
+  font-weight: 500;
+}
+
+/* ── Main ──────────────────────────────────────────────────── */
+.udash-main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+  display: grid;
+  gap: 20px;
+}
+
+/* ── Card ──────────────────────────────────────────────────── */
+.udash-card {
+  background: #111c2e;
+  border: 1px solid rgba(255 255 255 / 0.07);
+  border-radius: 16px;
+  padding: 28px 32px;
+}
+
+.udash-card__title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7a8ba8;
+  margin: 0 0 24px;
+}
+
+/* ── Prediction layout ─────────────────────────────────────── */
+.udash-prediction {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+/* ── AQI block ─────────────────────────────────────────────── */
+.udash-aqi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  background: rgba(255 255 255 / 0.04);
+  border-radius: 12px;
+  padding: 20px 16px;
+  border: 1px solid rgba(255 255 255 / 0.07);
+  flex-shrink: 0;
+  gap: 4px;
+}
+
+.udash-aqi__num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #e8edf5;
+}
+
+.udash-aqi__label {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7a8ba8;
+}
+
+.udash-aqi__tag {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(255 255 255 / 0.06);
+  color: #e8edf5;
+}
+
+/* AQI colour states */
+.udash-aqi--good     .udash-aqi__num { color: #22c55e; }
+.udash-aqi--good     .udash-aqi__tag { background: rgba(34 197 94 / 0.15); color: #22c55e; }
+.udash-aqi--moderate .udash-aqi__num { color: #eab308; }
+.udash-aqi--moderate .udash-aqi__tag { background: rgba(234 179 8 / 0.15); color: #eab308; }
+.udash-aqi--sensitive .udash-aqi__num { color: #f97316; }
+.udash-aqi--sensitive .udash-aqi__tag { background: rgba(249 115 22 / 0.15); color: #f97316; }
+.udash-aqi--poor     .udash-aqi__num { color: #ef4444; }
+.udash-aqi--poor     .udash-aqi__tag { background: rgba(239 68 68 / 0.15); color: #ef4444; }
+
+/* ── Detail rows ───────────────────────────────────────────── */
+.udash-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.udash-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255 255 255 / 0.07);
+}
+
+.udash-row:last-child {
+  border-bottom: none;
+}
+
+.udash-row__key {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7a8ba8;
+}
+
+.udash-row__val {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #e8edf5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Confidence bar ────────────────────────────────────────── */
+.udash-confidence-bar {
+  display: inline-block;
+  width: 80px;
+  height: 5px;
+  background: rgba(255 255 255 / 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.udash-confidence-bar__fill {
+  display: block;
+  height: 100%;
+  background: #2f7aff;
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+/* ── Loading ───────────────────────────────────────────────── */
+.udash-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #7a8ba8;
+  font-size: 0.9rem;
+}
+
+.udash-loading__fan {
+  width: 24px;
+  height: 24px;
+  animation: fan-spin 1s linear infinite;
+}
+
+/* ── Empty state ───────────────────────────────────────────── */
+.udash-empty {
+  color: #7a8ba8;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .udash-prediction {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .udash-aqi {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 16px 20px;
+  }
+
+  .udash-card {
+    padding: 20px;
+  }
+}
