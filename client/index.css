@@ -1,3 +1,331 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── CSS Variables ─────────────────────────────────────────── */
+:root {
+  --fc-bg:        #0b1220;
+  --fc-surface:   #111c2e;
+  --fc-border:    rgba(255 255 255 / 0.07);
+  --fc-blue:      #2f7aff;
+  --fc-blue-dim:  #1a4db0;
+  --fc-text:      #e8edf5;
+  --fc-muted:     #7a8ba8;
+  --fc-good:      #22c55e;
+  --fc-moderate:  #eab308;
+  --fc-sensitive: #f97316;
+  --fc-poor:      #ef4444;
+}
+
+/* ── Page shell ────────────────────────────────────────────── */
+.admin-page {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 60% 0%, #112244 0%, var(--fc-bg) 60%);
+  color: var(--fc-text);
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Navbar ────────────────────────────────────────────────── */
+.admin-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  height: 56px;
+  background: rgba(11 18 32 / 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--fc-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.admin-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-nav__fan {
+  width: 26px;
+  height: 26px;
+  animation: fan-spin 3s linear infinite;
+}
+
+.admin-nav__title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  color: var(--fc-text);
+}
+
+.admin-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-nav__badge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fc-blue);
+  border: 1px solid var(--fc-blue-dim);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+.admin-nav__logout {
+  background: transparent;
+  border: 1px solid var(--fc-border);
+  color: var(--fc-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.admin-nav__logout:hover {
+  color: var(--fc-text);
+  border-color: rgba(255 255 255 / 0.2);
+}
+
+/* ── Hero ──────────────────────────────────────────────────── */
+.admin-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 72px 24px 56px;
+  text-align: center;
+}
+
+.admin-hero__fan {
+  width: 90px;
+  height: 90px;
+  animation: fan-spin 2.5s linear infinite;
+  margin-bottom: 28px;
+  filter: drop-shadow(0 0 24px rgba(47 122 255 / 0.35));
+}
+
+.admin-hero__heading {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  color: var(--fc-blue);
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.admin-hero__sub {
+  font-size: 1rem;
+  color: var(--fc-muted);
+  margin: 0;
+}
+
+.admin-hero__sub strong {
+  color: var(--fc-text);
+  font-weight: 500;
+}
+
+/* ── Main grid ─────────────────────────────────────────────── */
+.admin-main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+  display: grid;
+  gap: 20px;
+}
+
+/* ── Card ──────────────────────────────────────────────────── */
+.admin-card {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-border);
+  border-radius: 16px;
+  padding: 28px 32px;
+}
+
+.admin-card__title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fc-muted);
+  margin: 0 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-card__live {
+  font-size: 0.65rem;
+  background: rgba(47 122 255 / 0.15);
+  color: var(--fc-blue);
+  border: 1px solid rgba(47 122 255 / 0.3);
+  border-radius: 999px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── Prediction layout ─────────────────────────────────────── */
+.prediction {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.prediction__aqi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  background: rgba(255 255 255 / 0.04);
+  border-radius: 12px;
+  padding: 20px 16px;
+  border: 1px solid var(--fc-border);
+  flex-shrink: 0;
+}
+
+.prediction__aqi-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--fc-text);
+}
+
+.prediction__aqi-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+  margin-top: 4px;
+}
+
+/* AQI colour states */
+.aqi-good    .prediction__aqi-num { color: var(--fc-good); }
+.aqi-moderate .prediction__aqi-num { color: var(--fc-moderate); }
+.aqi-sensitive .prediction__aqi-num { color: var(--fc-sensitive); }
+.aqi-poor    .prediction__aqi-num { color: var(--fc-poor); }
+
+.prediction__details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.prediction__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--fc-border);
+}
+
+.prediction__row:last-of-type {
+  border-bottom: none;
+}
+
+.prediction__key {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fc-muted);
+}
+
+.prediction__val {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--fc-text);
+}
+
+.prediction__note {
+  font-size: 0.75rem;
+  color: var(--fc-muted);
+  margin: 4px 0 0;
+  font-style: italic;
+}
+
+/* ── System info list ──────────────────────────────────────── */
+.admin-syslist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.admin-syslist__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--fc-border);
+}
+
+.admin-syslist__item:last-child {
+  border-bottom: none;
+}
+
+.admin-syslist__key {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fc-muted);
+}
+
+.admin-syslist__val {
+  font-size: 0.9rem;
+  color: var(--fc-text);
+}
+
+/* ── Loading state ─────────────────────────────────────────── */
+.admin-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--fc-muted);
+  font-size: 0.9rem;
+}
+
+.admin-loading__fan {
+  width: 24px;
+  height: 24px;
+  animation: fan-spin 1s linear infinite;
+}
+
+/* ── Fan spin keyframe ─────────────────────────────────────── */
+@keyframes fan-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .prediction {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .prediction__aqi {
+    width: 100%;
+    flex-direction: row;
+    gap: 12px;
+    padding: 16px 20px;
+  }
+
+  .admin-card {
+    padding: 20px;
+  }
+}
