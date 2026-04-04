@@ -35,7 +35,7 @@ export default function UserDashboard({ setUser }) {
         fetch('/api/ai/predict', { credentials: 'include' })
             .then(r => r.json())
             .then(data => {
-                setPrediction(data.prediction);
+                setPrediction(data);
                 setLoading(false);
             });
     }, []);
@@ -93,46 +93,42 @@ export default function UserDashboard({ setUser }) {
                     <h2 className="udash-card__title">Current Air Quality</h2>
 
                     {loading ? (
-                        <div className="udash-loading">
-                            <FanIcon className="udash-loading__fan" />
-                            <span>Fetching data…</span>
-                        </div>
-                    ) : prediction ? (
-                        <div className="udash-prediction">
-                            {/* Big AQI number */}
-                            <div className={`udash-aqi ${getAqiClass(prediction.aqi)}`}>
-                                <span className="udash-aqi__num">{prediction.aqi}</span>
-                                <span className="udash-aqi__label">AQI</span>
-                                <span className="udash-aqi__tag">{getAqiLabel(prediction.aqi)}</span>
-                            </div>
+    <div className="udash-loading">
+        <FanIcon className="udash-loading__fan" />
+        <span>Fetching data…</span>
+    </div>
+) : prediction ? (
+    <div className="udash-prediction">
+        {/* PPM 수치 */}
+        <div className="udash-aqi">
+            <span className="udash-aqi__num">
+                {prediction.sensorData?.ppm ?? '—'}
+            </span>
+            <span className="udash-aqi__label">PPM CO₂</span>
+        </div>
 
-                            {/* Detail rows */}
-                            <div className="udash-details">
-                                <div className="udash-row">
-                                    <span className="udash-row__key">Status</span>
-                                    <span className="udash-row__val">{prediction.quality}</span>
-                                </div>
-                                <div className="udash-row">
-                                    <span className="udash-row__key">Forecast</span>
-                                    <span className="udash-row__val">{prediction.forecast}</span>
-                                </div>
-                                <div className="udash-row">
-                                    <span className="udash-row__key">Confidence</span>
-                                    <span className="udash-row__val">
-                                        {(prediction.confidence * 100).toFixed(0)}%
-                                        <span className="udash-confidence-bar">
-                                            <span
-                                                className="udash-confidence-bar__fill"
-                                                style={{ width: `${(prediction.confidence * 100).toFixed(0)}%` }}
-                                            />
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <p className="udash-empty">No data available.</p>
-                    )}
+        {/* AI 텍스트 */}
+        <div className="udash-details">
+            <div className="udash-row">
+                <span className="udash-row__key">Samples</span>
+                <span className="udash-row__val">
+                    Last {prediction.sensorData?.sampleCount ?? '—'} readings
+                </span>
+            </div>
+            <div className="udash-row">
+                <span className="udash-row__key">Avg Voltage</span>
+                <span className="udash-row__val">
+                    {prediction.sensorData?.avgVoltage ?? '—'} V
+                </span>
+            </div>
+            <p style={{ marginTop: '0.75rem', lineHeight: '1.6', fontSize: '0.9rem' }}>
+                {prediction.prediction}
+            </p>
+        </div>
+    </div>
+) : (
+    <p className="udash-empty">No data available.</p>
+)}
                 </section>
 
             </main>

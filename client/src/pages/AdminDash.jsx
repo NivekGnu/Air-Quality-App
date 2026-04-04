@@ -33,7 +33,7 @@ export default function AdminDashboard({ setUser }) {
 
         fetch('/api/ai/predict', { credentials: 'include' })
             .then(r => r.json())
-            .then(data => setPrediction(data.prediction));
+            .then(data => setPrediction(data));
     }, []);
 
     async function logout() {
@@ -80,33 +80,45 @@ export default function AdminDashboard({ setUser }) {
             <main className="admin-main">
 
                 {/* AI Prediction Card */}
-                <section className="admin-card">
-                    <h2 className="admin-card__title">AI Prediction <span className="admin-card__live">live</span></h2>
-                    {prediction ? (
-                        <div className="prediction">
-                            <div className={`prediction__aqi ${getAqiClass(prediction.aqi)}`}>
-                                <span className="prediction__aqi-num">{prediction.aqi}</span>
-                                <span className="prediction__aqi-label">AQI</span>
-                            </div>
-                            <div className="prediction__details">
-                                <div className="prediction__row">
-                                    <span className="prediction__key">Status</span>
-                                    <span className="prediction__val">{prediction.quality}</span>
-                                </div>
-                                <div className="prediction__row">
-                                    <span className="prediction__key">Forecast</span>
-                                    <span className="prediction__val">{prediction.forecast}</span>
-                                </div>
-                                <p className="prediction__note">Model stub — real model coming in Milestone 2</p>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="admin-loading">
-                            <FanIcon className="admin-loading__fan" />
-                            <span>Fetching prediction…</span>
-                        </div>
-                    )}
-                </section>
+<section className="admin-card">
+    <h2 className="admin-card__title">
+        AI Prediction <span className="admin-card__live">live</span>
+    </h2>
+    {prediction ? (
+        <div className="prediction">
+            {/* PPM 수치 */}
+            <div className="prediction__aqi">
+                <span className="prediction__aqi-num">
+                    {prediction.sensorData?.ppm ?? '—'}
+                </span>
+                <span className="prediction__aqi-label">PPM</span>
+            </div>
+            <div className="prediction__details">
+                <div className="prediction__row">
+                    <span className="prediction__key">Status</span>
+                    <span className="prediction__val">
+                        {prediction.status === 'ok' ? '✅ Online' : '⚠️ Warning'}
+                    </span>
+                </div>
+                <div className="prediction__row">
+                    <span className="prediction__key">Samples</span>
+                    <span className="prediction__val">
+                        {prediction.sensorData?.sampleCount ?? '—'} readings
+                    </span>
+                </div>
+                {/* AI Text */}
+                <p style={{ marginTop: '0.75rem', lineHeight: '1.6', fontSize: '0.9rem' }}>
+                    {prediction.prediction}
+                </p>
+            </div>
+        </div>
+    ) : (
+        <div className="admin-loading">
+            <FanIcon className="admin-loading__fan" />
+            <span>Fetching prediction…</span>
+        </div>
+    )}
+</section>
 
                 {/* System Info Card */}
                 <section className="admin-card">
