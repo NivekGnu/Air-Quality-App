@@ -99,7 +99,7 @@ export default function UserDashboard({ setUser }) {
     </div>
 ) : prediction ? (
     <div className="udash-prediction">
-        {/* PPM 수치 */}
+        {/* PPM level */}
         <div className="udash-aqi">
             <span className="udash-aqi__num">
                 {prediction.sensorData?.ppm ?? '—'}
@@ -107,7 +107,7 @@ export default function UserDashboard({ setUser }) {
             <span className="udash-aqi__label">PPM CO₂</span>
         </div>
 
-        {/* AI 텍스트 */}
+        {/* AI Text */}
         <div className="udash-details">
             <div className="udash-row">
                 <span className="udash-row__key">Samples</span>

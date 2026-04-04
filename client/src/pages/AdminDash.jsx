@@ -86,7 +86,7 @@ export default function AdminDashboard({ setUser }) {
     </h2>
     {prediction ? (
         <div className="prediction">
-            {/* PPM 수치 */}
+            {/* PPM level */}
             <div className="prediction__aqi">
                 <span className="prediction__aqi-num">
                     {prediction.sensorData?.ppm ?? '—'}
