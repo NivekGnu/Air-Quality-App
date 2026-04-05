@@ -40,31 +40,37 @@ export default function UserDashboard({ setUser }) {
             }
         }, 2000);
     }
-    
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         const headers = { Authorization: `Bearer ${token}` };
 
         fetch('/api/auth/me', { headers })
             .then(r => r.json())
-            .then(data => setUserInfo(data.user));
-
-        fetch('/api/ai/predict', { headers })
-            .then(r => r.json())
-            .then(data => {
-                setPrediction(data);
-                setLoading(false);
-                setUserInfo(data.user);
-            })
+            .then(data => setUserInfo(data.user))
             .catch(err => console.error("Auth fetch error:", err));
     }, []);
 
     async function triggerAI() {
         setIsGenerating(true);
+        const token = localStorage.getItem('token'); // Grab the token
+
         try {
-            const r = await fetch('/api/ai/predict', { credentials: 'include' });
+            const r = await fetch('/api/ai/predict', {
+                headers: { Authorization: `Bearer ${token}` } // Send the token!
+            });
+
             const data = await r.json();
+
+            // Catch the 403 API Limit error from the server
+            if (r.status === 403) {
+                alert(data.message); // Simple popup telling them they are out of credits
+                setIsGenerating(false);
+                return; // Stop running
+            }
+
             setPrediction(data);
+
         } catch (err) {
             console.error("AI Error:", err);
         } finally {
@@ -107,9 +113,17 @@ export default function UserDashboard({ setUser }) {
                         alignItems: 'center',
                         marginBottom: '1.5rem'
                     }}>
-                        <h2 className="udash-card__title" style={{ margin: 0 }}>
-                            Current Air Quality
-                        </h2>
+                        <div>
+                            <h2 className="udash-card__title" style={{ margin: 0 }}>
+                                Current Air Quality
+                            </h2>
+                            {/* NEW: Display calls remaining */}
+                            {callsRemaining !== null && (
+                                <span style={{ fontSize: '0.85rem', color: callsRemaining === 0 ? '#e74c3c' : '#2ecc71', fontWeight: 'bold' }}>
+                                    {callsRemaining} free predictions remaining
+                                </span>
+                            )}
+                        </div>
                         <button
                             onClick={triggerAI}
                             disabled={isGenerating}
@@ -124,7 +138,7 @@ export default function UserDashboard({ setUser }) {
                                 transition: 'background 0.3s ease'
                             }}
                         >
-                            {isGenerating ? 'RUNNING...' : 'GENERATE PREDICTION'}
+                            {isGenerating ? 'RUNNING...' : callsRemaining === 0 ? 'LIMIT REACHED' : 'GENERATE PREDICTION'}
                         </button>
                     </div>
 

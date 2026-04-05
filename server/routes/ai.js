@@ -41,7 +41,32 @@ router.get('/latest-prediction', (req, res) => {
 // GET /api/ai/predict
 router.get('/predict', requireAuth, async (req, res) => {
     try {
-        // Step 1: Fetch the last 10 rows from the Logs DB
+        const userId = req.user.id; // JWT middleware
+        const MAX_FREE_CALLS = 10;
+
+        // api usage limiter
+        const userQuery = await db.query(
+            `SELECT api_calls_made 
+             FROM users 
+             WHERE id = $1`, 
+            [userId]
+        );
+
+        if (userQuery.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+
+        const callsMade = userQuery.rows[0].api_calls_made;
+
+        if (callsMade >= MAX_FREE_CALLS) {
+            console.log(`[Limit Reached] User ${userId} blocked.`);
+            return res.status(403).json({ 
+                error: 'API limit reached.',
+                message: `You have used all ${MAX_FREE_CALLS} of your free predictions.`
+            });
+        }
+
+        // Fetch the last 10 rows from logs
         const result = await db.query(
             `SELECT avg_voltage
              FROM logs
@@ -53,7 +78,7 @@ router.get('/predict', requireAuth, async (req, res) => {
             return res.status(404).json({ error: 'No sensor data available in logs.' });
         }
 
-        // Step 2: Calculates the avg voltage into PPM
+        // Calculates the avg voltage into PPM
         const voltages = result.rows.map(r => parseFloat(r.avg_voltage));
         const avgVoltage = voltages.reduce((sum, v) => sum + v, 0) / voltages.length;
         const rs = voltageToRs(avgVoltage);
@@ -61,7 +86,7 @@ router.get('/predict', requireAuth, async (req, res) => {
 
         console.log(`[AI] avgVoltage=${avgVoltage.toFixed(4)}V | Rs=${rs.toFixed(4)}kΩ | PPM=${ppm.toFixed(2)}`);
 
-        // Step 3: Groq API calls
+        // Groq API prompt
         const prompt =
             `This is the average CO2 concentration for the last 10 minutes: ${ppm.toFixed(2)} PPM. ` +
             `CRITICAL INSTRUCTION: Your very first line MUST be formatted exactly like this: "Air quality: [Status], [PPM] PPM." ` +
@@ -94,7 +119,15 @@ router.get('/predict', requireAuth, async (req, res) => {
             message: aiMessage.split('\n')[0].trim() // Display is small, keep it short!
         };
 
-        // Step 4: Returns a reply for the Client
+        // update count after successful prediction to avoid counting failed attempts
+        await db.query(
+            `UPDATE users 
+             SET api_calls_made = api_calls_made + 1 
+             WHERE id = $1`,
+            [userId]
+        );
+
+        // Returns a reply for the client
         res.json({
             status: 'ok',
             sensorData: {
@@ -104,6 +137,7 @@ router.get('/predict', requireAuth, async (req, res) => {
                 ppm: parseFloat(ppm.toFixed(2)),
             },
             prediction: aiMessage,
+            callsRemaining: MAX_FREE_CALLS - (callsMade + 1), // used for display on client side
         });
     } catch (err) {
         console.error('[AI] predict error:', err.message);

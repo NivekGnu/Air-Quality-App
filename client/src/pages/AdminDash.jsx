@@ -5,8 +5,10 @@ import FanIcon from '../components/FanIcon';
 export default function AdminDashboard({ setUser }) {
     const [prediction, setPrediction] = useState(null);
     const [adminInfo, setAdminInfo] = useState(null);
+    const [allUsers, setAllUsers] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const navigate = useNavigate();
+    // For breathalyzer testing
     const [breathResult, setBreathResult] = useState(null);
     const [breathTesting, setBreathTesting] = useState(false);
 
@@ -49,16 +51,18 @@ export default function AdminDashboard({ setUser }) {
             .then(data => setAdminInfo(data.user))
             .catch(err => console.error("Auth fetch error:", err));
 
-        // Note: Automatic AI fetch removed to allow for manual button trigger
+        fetch('/api/admin/users', { headers })
+            .then(r => r.json())
+            .then(data => setAllUsers(data))
+            .catch(err => console.error("Admin users fetch error:", err));
     }, []);
 
     async function triggerAI() {
         setIsGenerating(true);
         const token = localStorage.getItem('token');
         try {
-            // This hits your ai.js route, which now updates the 'latestPredictionForPi' mailbox
             const r = await fetch('/api/ai/predict', {
-                 headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${token}` },
             });
             const data = await r.json();
             setPrediction(data);
@@ -186,6 +190,53 @@ export default function AdminDashboard({ setUser }) {
                             </p>
                         </div>
                     )}
+                </section>
+
+                <section className="admin-card">
+                    <h2 className="admin-card__title">User API Consumption</h2>
+                    <p style={{ color: '#999', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                        Monitor Groq LLM usage across all registered accounts. Maximum free tier limit is 10 calls.
+                    </p>
+
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', color: '#ecf0f1' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid #333', background: 'rgba(255,255,255,0.05)' }}>
+                                    <th style={{ padding: '12px' }}>User Email</th>
+                                    <th style={{ padding: '12px' }}>Calls Made</th>
+                                    <th style={{ padding: '12px' }}>Calls Remaining</th>
+                                    <th style={{ padding: '12px' }}>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {allUsers.map(user => {
+                                    const maxCalls = 10;
+                                    const remaining = Math.max(0, maxCalls - (user.api_calls_made || 0));
+                                    const isMaxed = remaining === 0;
+
+                                    return (
+                                        <tr key={user.id} style={{ borderBottom: '1px solid #222' }}>
+                                            <td style={{ padding: '12px' }}>{user.email}</td>
+                                            <td style={{ padding: '12px', fontWeight: 'bold' }}>{user.api_calls_made || 0}</td>
+                                            <td style={{ padding: '12px', color: isMaxed ? '#e74c3c' : '#2ecc71' }}>
+                                                {remaining}
+                                            </td>
+                                            <td style={{ padding: '12px' }}>
+                                                {isMaxed ? '🛑 Blocked' : '✅ Active'}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                {allUsers.length === 0 && (
+                                    <tr>
+                                        <td colSpan="4" style={{ padding: '1rem', textAlign: 'center', color: '#999' }}>
+                                            Loading users...
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
 
                 {/* System Info Card */}
