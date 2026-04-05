@@ -2,12 +2,43 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FanIcon from '../components/FanIcon';
 
-
 export default function AdminDashboard({ setUser }) {
     const [prediction, setPrediction] = useState(null);
     const [adminInfo, setAdminInfo] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
     const navigate = useNavigate();
+    const [breathResult, setBreathResult] = useState(null);
+    const [breathTesting, setBreathTesting] = useState(false);
+
+    async function startBreathalyzer() {
+        setBreathTesting(true);
+        setBreathResult(null);
+
+        await fetch('/api/sensor/breathalyzer/start', {
+            method: 'POST',
+            credentials: 'include',
+        });
+
+        // poll for result
+        const interval = setInterval(async () => {
+            const r = await fetch('/api/sensor/breathalyzer/result', {
+                credentials: 'include'
+            });
+            const data = await r.json();
+            if (data.spike !== undefined) {
+                clearInterval(interval);
+                setBreathTesting(false);
+
+                if (data.spike > 1.5) {
+                    setBreathResult({ emoji: '🤢', message: "Yikes... you ok?" });
+                } else if (data.spike > 0.8) {
+                    setBreathResult({ emoji: '🤔', message: "Hmm, drink some water" });
+                } else {
+                    setBreathResult({ emoji: '✅', message: "Fresh as a daisy!" });
+                }
+            }
+        }, 2000);
+    }
 
     useEffect(() => {
         // Fetch Admin profile info on load
@@ -15,7 +46,7 @@ export default function AdminDashboard({ setUser }) {
             .then(r => r.json())
             .then(data => setAdminInfo(data.user))
             .catch(err => console.error("Auth fetch error:", err));
-        
+
         // Note: Automatic AI fetch removed to allow for manual button trigger
     }, []);
 
@@ -70,30 +101,30 @@ export default function AdminDashboard({ setUser }) {
 
                 {/* AI Prediction Card */}
                 <section className="admin-card">
-                    <div style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center', 
-                        marginBottom: '1.5rem' 
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '1.5rem'
                     }}>
                         <h2 className="admin-card__title" style={{ margin: 0 }}>
                             AI Prediction <span className="admin-card__live">manual</span>
                         </h2>
-                        <button 
-                            onClick={triggerAI} 
+                        <button
+                            onClick={triggerAI}
                             disabled={isGenerating}
-                            style={{ 
-                                background: isGenerating ? '#666' : '#e74c3c', 
-                                color: 'white', 
-                                border: 'none', 
-                                borderRadius: '4px', 
-                                padding: '10px 20px', 
+                            style={{
+                                background: isGenerating ? '#666' : '#e74c3c',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                padding: '10px 20px',
                                 cursor: isGenerating ? 'not-allowed' : 'pointer',
                                 fontWeight: 'bold',
                                 transition: 'background 0.3s ease'
                             }}
                         >
-                            {isGenerating ? 'RUNNING...' : 'FORCE PREDICTION'}
+                            {isGenerating ? 'RUNNING...' : 'GENERATE PREDICTION'}
                         </button>
                     </div>
 
@@ -130,10 +161,10 @@ export default function AdminDashboard({ setUser }) {
                                     </span>
                                 </div>
                                 {/* AI Text Analysis */}
-                                <div style={{ 
-                                    marginTop: '1rem', 
-                                    padding: '1rem', 
-                                    background: 'rgba(255,255,255,0.05)', 
+                                <div style={{
+                                    marginTop: '1rem',
+                                    padding: '1rem',
+                                    background: 'rgba(255,255,255,0.05)',
                                     borderRadius: '8px',
                                     borderLeft: '4px solid #e74c3c'
                                 }}>

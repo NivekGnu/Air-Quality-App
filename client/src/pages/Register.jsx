@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import FanIcon from '../components/FanIcon';
 
-
 export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
