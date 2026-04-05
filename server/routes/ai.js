@@ -5,11 +5,11 @@ const requireAuth = require('../middleware/requireAuth');
 
 
 // ── Sensor constants for the PPM formula ──
-const VCC  = parseFloat(process.env.SENSOR_VCC  || '5.0');   // Supplied voltage
-const RL   = parseFloat(process.env.SENSOR_RL   || '10.0');  // Load resistance (kΩ)
-const RO   = parseFloat(process.env.SENSOR_RO   || '10.0');  // Clean-air baseline resistance (kΩ)
-const A    = 110.47;   // CO2 scaling factor
-const B    = -2.862;   // CO2 exponent
+const VCC = parseFloat(process.env.SENSOR_VCC || '5.0');   // Supplied voltage
+const RL = parseFloat(process.env.SENSOR_RL || '10.0');  // Load resistance (kΩ)
+const RO = parseFloat(process.env.SENSOR_RO || '10.0');  // Clean-air baseline resistance (kΩ)
+const A = 110.47;   // CO2 scaling factor
+const B = -2.862;   // CO2 exponent
 
 // ── Groq config ──
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
@@ -30,8 +30,6 @@ function rsToPPM(rs) {
 }
 
 router.get('/latest-prediction', (req, res) => {
-    console.log(`[Pi Check] Buffer Status: ${lastPrediction ? 'Full' : 'Empty'}`);
-
     if (lastPrediction) {
         res.json({ new_data: true, ...lastPrediction });
         lastPrediction = null; // Clear it after sending
@@ -56,20 +54,20 @@ router.get('/predict', requireAuth, async (req, res) => {
         }
 
         // Step 2: Calculates the avg voltage into PPM
-        const voltages  = result.rows.map(r => parseFloat(r.avg_voltage));
+        const voltages = result.rows.map(r => parseFloat(r.avg_voltage));
         const avgVoltage = voltages.reduce((sum, v) => sum + v, 0) / voltages.length;
-        const rs         = voltageToRs(avgVoltage);
-        const ppm        = rsToPPM(rs);
+        const rs = voltageToRs(avgVoltage);
+        const ppm = rsToPPM(rs);
 
         console.log(`[AI] avgVoltage=${avgVoltage.toFixed(4)}V | Rs=${rs.toFixed(4)}kΩ | PPM=${ppm.toFixed(2)}`);
 
         // Step 3: Groq API calls
         const prompt =
             `This is the average CO2 concentration for the last 10 minutes: ${ppm.toFixed(2)} PPM. ` +
-            `Based on this data, predict the current air quality status, any potential health risks, ` +
-            `and recommend actions if necessary. Be concise and practical.`;
+            `CRITICAL INSTRUCTION: Your very first line MUST be formatted exactly like this: "Air quality: [Status], [PPM] PPM." ` +
+            `Hit 'Enter' to start a new line, and then provide your brief health risks and recommendations.`;
 
-            const groqResponse = await fetch(GROQ_API_URL, {
+        const groqResponse = await fetch(GROQ_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -88,12 +86,12 @@ router.get('/predict', requireAuth, async (req, res) => {
             throw new Error(`Groq API error ${groqResponse.status}: ${errText}`);
         }
 
-        const groqData  = await groqResponse.json();
+        const groqData = await groqResponse.json();
         const aiMessage = groqData.choices?.[0]?.message?.content || 'No response from AI.';
 
         lastPrediction = {
             ppm: ppm.toFixed(2),
-            message: aiMessage.substring(0, 50) // Display is small, keep it short!
+            message: aiMessage.split('\n')[0].trim() // Display is small, keep it short!
         };
 
         // Step 4: Returns a reply for the Client
@@ -101,16 +99,16 @@ router.get('/predict', requireAuth, async (req, res) => {
             status: 'ok',
             sensorData: {
                 sampleCount: voltages.length,
-                avgVoltage:  parseFloat(avgVoltage.toFixed(4)),
-                rs:          parseFloat(rs.toFixed(4)),
-                ppm:         parseFloat(ppm.toFixed(2)),
+                avgVoltage: parseFloat(avgVoltage.toFixed(4)),
+                rs: parseFloat(rs.toFixed(4)),
+                ppm: parseFloat(ppm.toFixed(2)),
             },
             prediction: aiMessage,
         });
     } catch (err) {
         console.error('[AI] predict error:', err.message);
         res.status(500).json({
-            error:   'Failed to generate prediction.',
+            error: 'Failed to generate prediction.',
             details: err.message,
         });
     }
