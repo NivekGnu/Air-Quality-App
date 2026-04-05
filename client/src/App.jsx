@@ -16,14 +16,16 @@ export default function App() {
     const [user, setUser] = useState(undefined); // undefined = loading
 
     useEffect(() => {
-        // Check if there's an active session on the server
-        fetch('/api/auth/me', { credentials: 'include' })
-            .then(r => {
-                if (!r.ok) return null;  // not logged in, return null
-                return r.json();
-            })
-            .then(data => setUser(data ? data.user : null))
-            .catch(() => setUser(null)); // catch any parse errors
+        const token = localStorage.getItem('token');
+
+        if (!token) return setUser(null);
+
+        fetch('/api/auth/me', {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => setUser(data ? data.user : null))
+        .catch(() => setUser(null));
     }, []);
 
     return (

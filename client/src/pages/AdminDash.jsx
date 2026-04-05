@@ -28,20 +28,23 @@ export default function AdminDashboard({ setUser }) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch Admin profile info on load
-        fetch('/api/auth/me', { credentials: 'include' })
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+
+        fetch('/api/auth/me', { headers })
             .then(r => r.json())
             .then(data => setAdminInfo(data.user))
             .catch(err => console.error("Auth fetch error:", err));
-        
-        // Note: Automatic AI fetch removed to allow for manual button trigger
     }, []);
 
     async function triggerAI() {
         setIsGenerating(true);
+        const token = localStorage.getItem('token');
         try {
             // This hits your ai.js route, which now updates the 'latestPredictionForPi' mailbox
-            const r = await fetch('/api/ai/predict', { credentials: 'include' });
+            const r = await fetch('/api/ai/predict', {
+                 headers: { Authorization: `Bearer ${token}` },
+            });
             const data = await r.json();
             setPrediction(data);
         } catch (err) {
@@ -52,9 +55,9 @@ export default function AdminDashboard({ setUser }) {
     }
 
     async function logout() {
+        localStorage.removeItem('token'); // Deletes the token
         await fetch('/api/auth/logout', {
-            method: 'POST',
-            credentials: 'include',
+            method: 'POST'
         });
         setUser(null);
         navigate('/login');

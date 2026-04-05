@@ -27,27 +27,36 @@ export default function Login({ setUser }) {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    // Stores the token
     async function handleSubmit(e) {
         e.preventDefault();
         setError('');
 
+        // Routes to authentication.js /login to generate token
         const res = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
             body: JSON.stringify({ email, password }),
         });
 
+        // Saves the handed token from the server
         const data = await res.json();
+        // To check in Dev tools
+        // console.log('Response:', data);
 
         if (!res.ok) {
             setError(data.error || 'Login failed');
             return;
         }
 
-        setUser(data.user);
+        // Stores JWT to localStorage
+        localStorage.setItem('token', data.token);
+        
+        // Parse user information from the token payload
+        const payload = JSON.parse(atob(data.token.split('.')[1]));
+        setUser(payload);
 
-        if (data.user.role === 'admin') {
+        if (payload.role === 'admin') {
             navigate('/admin');
         } else {
             navigate('/dashboard');

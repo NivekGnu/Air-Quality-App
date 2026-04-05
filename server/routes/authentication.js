@@ -1,8 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const db = require('../db');
 
 const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET; // Needs to add in .env file
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
@@ -28,7 +30,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// POST /api/auth/login
+// POST /api/auth/login -> When user logs in, generates JWT
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -48,9 +50,14 @@ router.post('/login', async (req, res) => {
         if (!match)
             return res.status(401).json({ error: 'Invalid credentials' });
 
-        req.session.user = { id: user.id, email: user.email, role: user.role };
+        // Issue a JWT instead of session
+        const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
-        res.json({ user: req.session.user });
+        res.json({ token }); // client stores JWT in its localstorage
     } catch (err) {
         console.error('Login error:', err.message);
         res.status(500).json({ error: 'Server error' });
@@ -60,16 +67,12 @@ router.post('/login', async (req, res) => {
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
-    req.session.destroy(() => {
         res.json({ message: 'Logged out' });
-    });
 });
 
-// GET /api/auth/me — returns current logged-in user from session
-router.get('/me', (req, res) => {
-    if (!req.session.user)
-        return res.status(401).json({ error: 'Not logged in' });
-    res.json({ user: req.session.user });
+// GET /api/auth/me — returns req.user with requireAuth
+router.get('/me', require('../middleware/requireAuth'), (req, res) => {
+    res.json({ user: req.user });
 });
 
 module.exports = router;

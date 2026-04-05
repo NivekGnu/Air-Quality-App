@@ -28,11 +28,14 @@ export default function UserDashboard({ setUser }) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch('/api/auth/me', { credentials: 'include' })
+        const token = localStorage.getItem('token');
+        const headers = { Authorization: `Bearer ${token}` };
+
+        fetch('/api/auth/me', { headers })
             .then(r => r.json())
             .then(data => setUserInfo(data.user));
 
-        fetch('/api/ai/predict', { credentials: 'include' })
+        fetch('/api/ai/predict', { headers })
             .then(r => r.json())
             .then(data => {
                 setPrediction(data);
@@ -41,9 +44,9 @@ export default function UserDashboard({ setUser }) {
     }, []);
 
     async function logout() {
+        localStorage.removeItem('token'); // Deletes the token
         await fetch('/api/auth/logout', {
-            method: 'POST',
-            credentials: 'include',
+            method: 'POST'
         });
         setUser(null);
         navigate('/login');
