@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const requireAuth = require('../middleware/requireAuth');
+
 
 // ── Sensor constants for the PPM formula ──
 const VCC  = parseFloat(process.env.SENSOR_VCC  || '5.0');   // Supplied voltage
@@ -12,6 +14,8 @@ const B    = -2.862;   // CO2 exponent
 // ── Groq config ──
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
+
+let lastPrediction = null; // Store the last prediction for pi use later
 
 // ── Helper: Voltage → Rs ──
 // Rs = ((Vcc - Vout) / Vout) × RL
@@ -25,8 +29,19 @@ function rsToPPM(rs) {
     return A * Math.pow(rs / RO, B);
 }
 
+router.get('/latest-prediction', (req, res) => {
+    console.log(`[Pi Check] Buffer Status: ${lastPrediction ? 'Full' : 'Empty'}`);
+
+    if (lastPrediction) {
+        res.json({ new_data: true, ...lastPrediction });
+        lastPrediction = null; // Clear it after sending
+    } else {
+        res.json({ new_data: false });
+    }
+});
+
 // GET /api/ai/predict
-router.get('/predict', async (req, res) => {
+router.get('/predict', requireAuth, async (req, res) => {
     try {
         // Step 1: Fetch the last 10 rows from the Logs DB
         const result = await db.query(
@@ -75,6 +90,11 @@ router.get('/predict', async (req, res) => {
 
         const groqData  = await groqResponse.json();
         const aiMessage = groqData.choices?.[0]?.message?.content || 'No response from AI.';
+
+        lastPrediction = {
+            ppm: ppm.toFixed(2),
+            message: aiMessage.substring(0, 50) // Display is small, keep it short!
+        };
 
         // Step 4: Returns a reply for the Client
         res.json({
