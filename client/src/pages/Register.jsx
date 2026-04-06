@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import FanIcon from '../components/FanIcon';
 
-export default function Register() {
+export default function Register({ setUser }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('user');
@@ -28,8 +28,18 @@ export default function Register() {
             return;
         }
 
-        setSuccess('Account created! Redirecting to login...');
-        setTimeout(() => navigate('/login'), 1500);
+        localStorage.setItem('token', data.token);
+
+        const payload = JSON.parse(atob(data.token.split('.')[1]));
+        setUser(payload);
+
+        if (payload.role === 'admin') {
+            setSuccess('Admin account created! Redirecting to dashboard...');
+            setTimeout(() => navigate('/admin'), 1500);
+        } else {
+            setSuccess('Account created! Redirecting to dashboard...');
+            setTimeout(() => navigate('/dashboard'), 1500);
+        }
     }
 
     return (
