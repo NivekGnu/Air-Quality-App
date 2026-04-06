@@ -51,10 +51,17 @@ export default function AdminDashboard({ setUser }) {
             .then(data => setAdminInfo(data.user))
             .catch(err => console.error("Auth fetch error:", err));
 
-        fetch('/api/admin/users', { headers })
-            .then(r => r.json())
-            .then(data => setAllUsers(data))
-            .catch(err => console.error("Admin users fetch error:", err));
+        const reloadAllUsers = () => {
+            fetch('/api/admin/users', { headers })
+                .then(r => r.json())
+                .then(data => setAllUsers(data))
+                .catch(err => console.error("Admin users fetch error:", err));
+        };
+
+        reloadAllUsers();
+        const interval = setInterval(reloadAllUsers, 15000);
+        
+        return () => clearInterval(interval);
     }, []);
 
     async function triggerAI() {
@@ -66,6 +73,13 @@ export default function AdminDashboard({ setUser }) {
             });
             const data = await r.json();
             setPrediction(data);
+
+            const usersRes = await fetch('/api/admin/users', { 
+                headers: { Authorization: `Bearer ${token}` } 
+            });
+            
+            const usersData = await usersRes.json();
+            setAllUsers(usersData);
         } catch (err) {
             console.error("Admin AI Error:", err);
         } finally {

@@ -10,6 +10,7 @@ export default function UserDashboard({ setUser }) {
     const navigate = useNavigate();
     const [breathResult, setBreathResult] = useState(null);
     const [breathTesting, setBreathTesting] = useState(false);
+    const [callsRemaining, setCallsRemaining] = useState(null); 
 
     async function startBreathalyzer() {
         setBreathTesting(true);
@@ -49,6 +50,11 @@ export default function UserDashboard({ setUser }) {
             .then(r => r.json())
             .then(data => setUserInfo(data.user))
             .catch(err => console.error("Auth fetch error:", err));
+
+        fetch('/api/user/usage', { headers })
+            .then(r => r.json())
+            .then(data => setCallsRemaining(data.callsRemaining))
+            .catch(err => console.error("Usage fetch error:", err));
     }, []);
 
     async function triggerAI() {
@@ -70,6 +76,7 @@ export default function UserDashboard({ setUser }) {
             }
 
             setPrediction(data);
+            setCallsRemaining(prev => Math.max(0, prev - 1));
 
         } catch (err) {
             console.error("AI Error:", err);
