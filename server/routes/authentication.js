@@ -21,8 +21,15 @@ router.post('/register', async (req, res) => {
             'INSERT INTO users (email, password_hash, role) VALUES ($1, $2, $3) RETURNING id, email, role',
             [email, passwordHash, userRole]
         );
+        const user = result.rows[0];
 
-        res.status(201).json({ user: result.rows[0] });
+        const token = jwt.sign(
+            { id: user.id, email: user.email, role: user.role },
+            JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.status(201).json({ token, user: result.rows[0] });
     } catch (err) {
         if (err.code === '23505')
             return res.status(409).json({ error: 'Email already registered' });
