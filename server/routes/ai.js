@@ -84,8 +84,6 @@ router.get('/predict', requireAuth, async (req, res) => {
         const rs = voltageToRs(avgVoltage);
         const ppm = rsToPPM(rs);
 
-        console.log(`[AI] avgVoltage=${avgVoltage.toFixed(4)}V | Rs=${rs.toFixed(4)}kΩ | PPM=${ppm.toFixed(2)}`);
-
         // Groq API prompt
         const prompt =
             `This is the average CO2 concentration for the last 10 minutes: ${ppm.toFixed(2)} PPM. ` +
