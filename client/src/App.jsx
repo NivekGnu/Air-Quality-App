@@ -12,6 +12,18 @@ function PrivateRoute({ user, adminOnly, children }) {
     return children;
 }
 
+function UserRoute({ user, children }) {
+    if (user === undefined) return null; // still loading
+    if (user !== null) {
+        if (user.role === 'admin') {
+            return <Navigate to="/admin" />;
+        }
+        return <Navigate to="/dashboard" />;
+    }
+
+    return children;
+}
+
 export default function App() {
     const [user, setUser] = useState(undefined); // undefined = loading
 
@@ -23,17 +35,38 @@ export default function App() {
         fetch('/api/auth/me', {
             headers: { Authorization: `Bearer ${token}` },
         })
-        .then(r => r.ok ? r.json() : null)
-        .then(data => setUser(data ? data.user : null))
-        .catch(() => setUser(null));
+            .then(r => r.ok ? r.json() : null)
+            .then(data => setUser(data ? data.user : null))
+            .catch(() => setUser(null));
     }, []);
 
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<Navigate to="/login" />} />
-                <Route path="/login" element={<Login setUser={setUser} />} />
-                <Route path="/register" element={<Register />} />
+                <Route
+                    path="/"
+                    element={
+                        <UserRoute user={user}>
+                            <Navigate to="/login" />
+                        </UserRoute>
+                    }
+                />
+                <Route
+                    path="/login"
+                    element={
+                        <UserRoute user={user}>
+                            <Login setUser={setUser} />
+                        </UserRoute>
+                    }
+                />
+                <Route
+                    path="/register"
+                    element={
+                        <UserRoute user={user}>
+                            <Register setUser={setUser} />
+                        </UserRoute>
+                    }
+                />
                 <Route
                     path="/dashboard"
                     element={
