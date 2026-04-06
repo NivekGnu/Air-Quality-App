@@ -60,7 +60,7 @@ export default function AdminDashboard({ setUser }) {
 
         reloadAllUsers();
         const interval = setInterval(reloadAllUsers, 15000);
-        
+
         return () => clearInterval(interval);
     }, []);
 
@@ -74,10 +74,10 @@ export default function AdminDashboard({ setUser }) {
             const data = await r.json();
             setPrediction(data);
 
-            const usersRes = await fetch('/api/admin/users', { 
-                headers: { Authorization: `Bearer ${token}` } 
+            const usersRes = await fetch('/api/admin/users', {
+                headers: { Authorization: `Bearer ${token}` }
             });
-            
+
             const usersData = await usersRes.json();
             setAllUsers(usersData);
         } catch (err) {
@@ -201,6 +201,37 @@ export default function AdminDashboard({ setUser }) {
                         <div style={{ padding: '2rem', textAlign: 'center' }}>
                             <p style={{ color: '#999', marginBottom: '0' }}>
                                 No active prediction. Use the button above to analyze the latest database logs.
+                            </p>
+                        </div>
+                    )}
+                </section>
+
+                <section className="udash-card">
+                    <h2 className="udash-card__title">Breathalyzer</h2>
+                    <p style={{ color: '#999', marginBottom: '1rem' }}>
+                        Point the MQ135 sensor toward you and press the button
+                    </p>
+                    <button
+                        onClick={startBreathalyzer}
+                        disabled={breathTesting}
+                        style={{
+                            background: breathTesting ? '#666' : '#2ecc71',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '10px 20px',
+                            cursor: breathTesting ? 'not-allowed' : 'pointer',
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        {breathTesting ? 'ANALYZING...' : 'START BREATHALYZER'}
+                    </button>
+
+                    {breathResult && (
+                        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+                            <p style={{ fontSize: '3rem' }}>{breathResult.emoji}</p>
+                            <p style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
+                                {breathResult.message}
                             </p>
                         </div>
                     )}
